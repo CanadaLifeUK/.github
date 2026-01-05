@@ -1,0 +1,17 @@
+name: Generic Issue
+description: A generic issue template that can be used by any team in GitHub
+title: "[Issue]: "
+labels: []
+assignees: []
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thanks for taking the time to fill out this feature request!
+- type: textarea
+  id: Description
+  attributes:
+    label: Description
+    description: Brief description of the issue.
+  validations:
+    required: false

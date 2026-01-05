@@ -1,0 +1,35 @@
+name: Cloud Platform Support
+description: Require support from Cloud Platform, but not technically an issue?
+title: "[Support]: "
+labels: ["Support"]
+type: Support
+projects: ["CanadaLifeUK/17"] # Cloud Platform Team
+assignees: []
+body:
+- type: markdown
+  attributes:
+    value: |
+      The Platform Team will prioritise and reach out to resolve the issue.
+- type: input
+  id: contact
+  attributes:
+    label: Contact
+    description: Team or User
+    placeholder: Digital | John Smith
+- type: dropdown
+  id: support-type
+  attributes:
+    label: Support type?
+    options:
+    - General Support
+    - Incident
+    - Request
+    - Question
+    - Other
+- type: textarea
+  id: support-summary
+  attributes:
+    label: Support summary
+    description: Brief description about the support required
+  validations:
+    required: true

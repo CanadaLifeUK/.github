@@ -1,0 +1,26 @@
+name: Cloud Platform Issue
+description: Raise an issue with Cloud Platform Team
+title: "[Issue]: "
+labels: ["bug"]
+projects: ["CanadaLifeUK/17"] # Cloud Platform Team
+assignees: []
+body:
+- type: markdown
+  attributes:
+    value: |
+      Please raise any platform issues here. We will get back to you as soon as possible.
+- type: textarea
+  id: what-happened
+  attributes:
+    label: What happened?
+    description: Also tell us, what did you expect to happen?
+    placeholder: Tell us what you see!
+    value: "A bug happened!"
+  validations:
+    required: true
+- type: textarea
+  id: logs
+  attributes:
+    label: Relevant log output
+    description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+    render: shell
