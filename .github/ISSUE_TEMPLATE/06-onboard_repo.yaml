@@ -1,0 +1,20 @@
+name: Onboard my repo
+description: Request onboarding for a repository
+title: "[Onboard]: "
+labels: ["onboarding"]
+assignees: []
+body:
+- type: markdown
+  attributes:
+    value: |
+      Thanks for requesting repository onboarding! Tell us what kind of repo it is.
+- type: dropdown
+  id: repo-type
+  attributes:
+    label: Repository type
+    description: What kind of repository is this?
+    options:
+      - dotnet
+      - javascript
+  validations:
+    required: true
