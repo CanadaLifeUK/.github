@@ -7,14 +7,45 @@ body:
 - type: markdown
   attributes:
     value: |
-      Thanks for requesting repository onboarding! Tell us what kind of repo it is.
-- type: dropdown
-  id: repo-type
+      Thanks for requesting repository onboarding! These values are used by Platform Operator to prepare the tenant GitOps sync.
+- type: input
+  id: application-name
   attributes:
-    label: Repository type
-    description: What kind of repository is this?
+    label: Application name
+    description: Name of the application being onboarded. This becomes the GitOps sync name and workload namespace.
+    placeholder: sample-app
+  validations:
+    required: true
+- type: checkboxes
+  id: deployment-environments
+  attributes:
+    label: Deployment environments
+    description: Which environments should be onboarded?
+    options:
+      - label: dev
+      - label: pre
+      - label: prd
+  validations:
+    required: true
+- type: input
+  id: git-branch
+  attributes:
+    label: Git branch
+    description: Branch Platform Operator should reconcile from.
+    value: main
+  validations:
+    required: true
+- type: dropdown
+  id: datadog-language
+  attributes:
+    label: Datadog language
+    description: Application runtime language for Datadog instrumentation.
     options:
       - dotnet
-      - javascript
+      - java
+      - js
+      - python
+      - ruby
+      - php
   validations:
     required: true
