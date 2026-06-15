@@ -12,8 +12,8 @@ body:
   id: application-name
   attributes:
     label: Application name
-    description: Name of the application being onboarded. This becomes the GitOps sync name, deploy path, and workload namespace.
-    placeholder: claims-portal-api
+    description: Name of the application being onboarded. This becomes the GitOps sync name and workload namespace.
+    placeholder: sample-app
   validations:
     required: true
 - type: checkboxes
