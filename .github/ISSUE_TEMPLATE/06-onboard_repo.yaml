@@ -1,7 +1,7 @@
 name: Onboard my repo
 description: Request onboarding for a repository
 title: "[Onboard]: "
-labels: ["onboarding"]
+labels: ["gitops-onboard"]
 assignees: []
 body:
 - type: markdown
