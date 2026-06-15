@@ -16,15 +16,15 @@ body:
     placeholder: claims-portal-api
   validations:
     required: true
-- type: dropdown
-  id: deployment-environment
+- type: checkboxes
+  id: deployment-environments
   attributes:
-    label: Deployment environment
-    description: Which environment should be onboarded first?
+    label: Deployment environments
+    description: Which environments should be onboarded?
     options:
-      - dev
-      - pre
-      - prd
+      - label: dev
+      - label: pre
+      - label: prd
   validations:
     required: true
 - type: input
@@ -33,16 +33,6 @@ body:
     label: Git branch
     description: Branch Platform Operator should reconcile from.
     value: main
-  validations:
-    required: true
-- type: dropdown
-  id: repo-type
-  attributes:
-    label: Repository type
-    description: What kind of repository is this?
-    options:
-      - dotnet
-      - javascript
   validations:
     required: true
 - type: dropdown
