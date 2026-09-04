@@ -24,6 +24,67 @@ Describe 'Organisation-wide dynamic environments onboarding issue form' {
         }
     )
 
+    $securityWordingCases = @(
+        @{
+            Name = 'the automation label requests validation without authorising deployment'
+            Source = 'markdown'
+            Because = 'applying the label must request validation only and must not be represented as deployment authorisation'
+            Patterns = @(
+                '(?is)\blabel\b.*\b(only|solely)\b.*\b(request|trigger).*\bvalidation\b',
+                '(?is)\blabel\b.*\b(does not|doesn''t|never|cannot)\b.*\bauthori[sz]e\b.*\bdeploy'
+            )
+        }
+        @{
+            Name = 'the bot independently checks every prerequisite before opening pull requests'
+            Source = 'markdown'
+            Because = 'automation must independently verify authority and repository safety before it opens a pull request'
+            Patterns = @(
+                '(?is)\b(bot|automation)\b.*\bindependent(ly)?\b.*\b(check|verify|validat)',
+                '(?i)\brequester\b.*\bpermission',
+                '(?i)\btenant\b.*\bownership\b',
+                '(?i)\brepository\b.*\bstate\b',
+                '(?i)\ball\b.*\binputs?\b',
+                '(?is)\bbefore\b.*\b(open|creat)(s|es|ing)?\b.*\b(PR|pull request)'
+            )
+        }
+        @{
+            Name = 'the application name is described as untrusted input'
+            Source = 'application-name-description'
+            Because = 'requesters must understand that the submitted application name is not trusted by automation'
+            Patterns = @('(?i)\b(submitted|provided|this)\b.*\b(value|application name|input)\b.*\b(untrusted|not trusted)\b')
+        }
+        @{
+            Name = 'the development overlay path is described as untrusted input'
+            Source = 'development-overlay-description'
+            Because = 'requesters must understand that the submitted development overlay path is not trusted by automation'
+            Patterns = @('(?i)\b(submitted|provided|this)\b.*\b(value|path|input)\b.*\b(untrusted|not trusted)\b')
+        }
+        @{
+            Name = 'the bot requires a DNS-label application name'
+            Source = 'application-name-description'
+            Because = 'the form must state that automation validates the application name as a DNS label rather than implying client-side enforcement'
+            Patterns = @('(?is)\b(bot|automation)\b.*\b(require|check|validat)(s|es)?\b.*\bDNS[- ]label\b')
+        }
+        @{
+            Name = 'the bot requires a canonical repository-relative development overlay path'
+            Source = 'development-overlay-description'
+            Because = 'the form must state the canonical repository-relative path contract that automation validates'
+            Patterns = @('(?is)\b(bot|automation)\b.*\b(require|check|validat)(s|es)?\b.*\bcanonical\b.*\brepository[- ]relative\b')
+        }
+        @{
+            Name = 'unsafe paths interpolation and rendered resources are rejected'
+            Source = 'development-overlay-description'
+            Because = 'requesters must be warned about every class of input or rendered output that automation rejects'
+            Patterns = @(
+                '(?i)\breject(s|ed|ing)?\b.*\babsolute paths?\b',
+                '(?i)\.\..*\b(traversal|path)\b|\b(traversal|path)\b.*\.\.',
+                '(?i)\bsymlinks?\b.*\b(escape|outside)\b.*\brepositor',
+                '(?i)\bunsafe\b.*\binterpolation\b',
+                '(?i)\bunsupported\b.*\brendered\b.*\bresources?\b'
+            )
+        }
+    )
+
     BeforeAll {
         $templatePath = Join-Path $PSScriptRoot '..\.github\ISSUE_TEMPLATE\07-onboard_dynamic_environments.yaml'
         $templateExists = Test-Path -LiteralPath $templatePath -PathType Leaf
@@ -53,6 +114,12 @@ Describe 'Organisation-wide dynamic environments onboarding issue form' {
                         $_.type -eq 'input' -and
                         (($_.attributes.label, $_.attributes.description) -join ' ') -match '(?i)development.*overlay.*path|dev.*overlay.*path'
                     })
+
+            $applicationNameDescription = @($applicationName |
+                    ForEach-Object { $_.attributes.description }) -join "`n"
+
+            $developmentOverlayDescription = @($developmentOverlay |
+                    ForEach-Object { $_.attributes.description }) -join "`n"
 
             $requestedFieldText = @($form.body |
                     Where-Object type -In @('input', 'textarea', 'dropdown') |
@@ -86,6 +153,19 @@ Describe 'Organisation-wide dynamic environments onboarding issue form' {
             Should -Match '(?is)(separate|distinct).*(ordinary|standard).*(GitOps).*(onboard)' -Because 'requesters must be told this is separate from ordinary GitOps onboarding'
         $markdown |
             Should -Match '(?i)(only|supports only).*(dev-green)|dev-green.*(only|sole)' -Because 'the standalone form supports only dev-green'
+    }
+
+    It 'states <Name>' -ForEach $securityWordingCases {
+        $observedText = switch ($Source) {
+            'markdown' { $markdown }
+            'application-name-description' { $applicationNameDescription }
+            'development-overlay-description' { $developmentOverlayDescription }
+        }
+
+        foreach ($pattern in $Patterns) {
+            $observedText |
+                Should -Match $pattern -Because $Because
+        }
     }
 
     It 'requires acknowledgement of existing standard onboarding' {
