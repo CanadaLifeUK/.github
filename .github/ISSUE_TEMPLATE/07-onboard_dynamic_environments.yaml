@@ -1,0 +1,47 @@
+name: Onboard dynamic environments
+description: Request PR-driven dev-green environments for an existing GitOps application
+title: "[Dynamic environments] "
+labels: ["dynamic-environments-onboard"]
+body:
+- type: markdown
+  attributes:
+    value: |
+      This request is separate from ordinary GitOps onboarding and supports dev-green only.
+      Do not include credentials, tenant IDs, subscriptions, client IDs, resource IDs, or secrets.
+- type: checkboxes
+  id: prerequisites
+  attributes:
+    label: Existing onboarding
+    options:
+      - label: Ordinary GitOps onboarding and the standard Docker workflow already exist for this application.
+        required: true
+- type: input
+  id: application-name
+  attributes:
+    label: XKubernetesApp application name
+    description: Enter the XKubernetesApp application name. It must be a valid Kubernetes DNS label (lowercase letters, numbers, and hyphens; start and end with a letter or number).
+    placeholder: sample-app
+  validations:
+    required: true
+- type: input
+  id: development-overlay-path
+  attributes:
+    label: Development overlay path
+    description: Repository-relative path to the development overlay.
+    value: deploy/dev
+  validations:
+    required: true
+- type: checkboxes
+  id: pull-request-branch
+  attributes:
+    label: Pull request branch
+    options:
+      - label: I acknowledge that only pull request branches from this same repository are supported.
+        required: true
+- type: checkboxes
+  id: azure-dependencies
+  attributes:
+    label: Azure dependencies
+    options:
+      - label: I acknowledge that approved Crossplane compositions must own Azure dependencies; no direct Bicep, Terraform, Azure CLI, or provider-resource deployment is supported.
+        required: true
