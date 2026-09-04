@@ -1,0 +1,49 @@
+name: Onboard dynamic environments
+description: Request PR-driven dev-green environments for an existing GitOps application
+title: "[Dynamic environments] "
+labels: ["dynamic-environments-onboard"]
+body:
+- type: markdown
+  attributes:
+    value: |
+      This request is separate from ordinary GitOps onboarding and supports dev-green only.
+      Applying this label only requests validation and does not authorize deployment.
+      Before opening a pull request, the bot independently checks requester permission, tenant ownership, repository state, and all inputs.
+      Do not include credentials, tenant IDs, subscriptions, client IDs, resource IDs, or secrets.
+- type: checkboxes
+  id: prerequisites
+  attributes:
+    label: Existing onboarding
+    options:
+      - label: Ordinary GitOps onboarding and the standard Docker workflow already exist for this application.
+        required: true
+- type: input
+  id: application-name
+  attributes:
+    label: XKubernetesApp application name
+    description: This submitted value is untrusted. The bot requires a Kubernetes DNS-label application name using lowercase letters, numbers, and hyphens, starting and ending with a letter or number.
+    placeholder: sample-app
+  validations:
+    required: true
+- type: input
+  id: development-overlay-path
+  attributes:
+    label: Development overlay path
+    description: This submitted path is untrusted. The bot requires a canonical repository-relative development overlay path and rejects absolute paths, .. traversal, symlinks that escape the repository, unsafe interpolation, and unsupported rendered resources.
+    value: deploy/dev
+  validations:
+    required: true
+- type: checkboxes
+  id: pull-request-branch
+  attributes:
+    label: Pull request branch
+    options:
+      - label: I acknowledge that only pull request branches from this same repository are supported.
+        required: true
+- type: checkboxes
+  id: azure-dependencies
+  attributes:
+    label: Azure dependencies
+    options:
+      - label: I acknowledge that approved Crossplane compositions must own Azure dependencies; no direct Bicep, Terraform, Azure CLI, or provider-resource deployment is supported.
+        required: true
