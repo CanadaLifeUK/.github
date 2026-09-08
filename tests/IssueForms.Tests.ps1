@@ -200,6 +200,11 @@ Describe 'Organisation-wide dynamic environments onboarding issue form' {
             Should -BeTrue -Because 'an XKubernetesApp application name is necessary to onboard the workload'
     }
 
+    It 'states the 63-character maximum for the XKubernetesApp application name' {
+        $applicationNameDescription |
+            Should -Match '(?i)\b(maximum|max)\b.{0,30}\b63\b.{0,20}\bcharacters?\b|\b63\b.{0,20}\bcharacters?\b.{0,30}\b(maximum|max)\b' -Because 'requesters must know that a Kubernetes DNS label cannot exceed 63 characters'
+    }
+
     It 'provides the expected development overlay default' {
         $developmentOverlay.Count |
             Should -Be 1 -Because 'the form must expose one development overlay path field'

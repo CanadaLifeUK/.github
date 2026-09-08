@@ -21,7 +21,7 @@ body:
   id: application-name
   attributes:
     label: XKubernetesApp application name
-    description: This submitted value is untrusted. The bot requires a Kubernetes DNS-label application name using lowercase letters, numbers, and hyphens, starting and ending with a letter or number.
+    description: This submitted value is untrusted. The bot requires a Kubernetes DNS-label application name with a maximum of 63 characters, using lowercase letters, numbers, and hyphens, and starting and ending with a letter or number.
     placeholder: sample-app
   validations:
     required: true
