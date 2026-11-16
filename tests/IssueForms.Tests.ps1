@@ -236,3 +236,75 @@ Describe 'Organisation-wide dynamic environments onboarding issue form' {
             Should -Not -Match '(?i)\b(credentials?|tenant IDs?|subscriptions?|client IDs?|resource IDs?|secrets?)\b' -Because 'the public issue form must not request sensitive identifiers or secrets'
     }
 }
+
+Describe 'Organisation-wide Deployment Guide onboarding issue form' {
+    BeforeAll {
+        $templatePath = Join-Path $PSScriptRoot '..\.github\ISSUE_TEMPLATE\08-onboard_deployment_guide.yaml'
+        $templateExists = Test-Path -LiteralPath $templatePath -PathType Leaf
+
+        if ($templateExists) {
+            Import-Module powershell-yaml -ErrorAction Stop
+            $form = Get-Content -LiteralPath $templatePath -Raw | ConvertFrom-Yaml
+
+            $markdown = @($form.body |
+                    Where-Object type -EQ 'markdown' |
+                    ForEach-Object { $_.attributes.value }) -join "`n"
+
+            $fields = @($form.body | Where-Object type -NE 'markdown')
+            $environments = @($fields | Where-Object id -EQ 'environments')
+            $syncRoot = @($fields | Where-Object id -EQ 'gitops-sync-root')
+        }
+    }
+
+    It 'exists as a standalone organisation-wide form' {
+        $templateExists |
+            Should -BeTrue -Because 'the organisation-wide Deployment Guide onboarding issue form must exist'
+    }
+
+    It 'sets the form name, title prefix and automation label' {
+        $form.name |
+            Should -BeExactly 'Onboard to the Deployment Guide' -Because 'the bot documentation names the form exactly'
+        $form.title.TrimEnd() |
+            Should -BeExactly '[Deployment Guide]' -Because 'new issues must use the Deployment Guide title prefix'
+        @($form.labels) |
+            Should -BeExactly @('deployment-guide-onboard') -Because 'the Platform Operator bot acts only on issues carrying this label'
+    }
+
+    It 'contains only the environments and GitOps sync root fields' {
+        @($fields | ForEach-Object { $_.id }) |
+            Should -BeExactly @('environments', 'gitops-sync-root') -Because 'the bot parses exactly these two form sections'
+    }
+
+    It 'offers a Deployment Guide environments checkbox group with optional dev, pre and prd options' {
+        $environments.Count | Should -Be 1
+        $environments[0].type | Should -BeExactly 'checkboxes'
+        $environments[0].attributes.label |
+            Should -BeExactly 'Deployment Guide environments' -Because 'the bot locates the environments section by this exact heading'
+        @($environments[0].attributes.options | ForEach-Object { $_.label }) |
+            Should -BeExactly @('dev', 'pre', 'prd') -Because 'the bot accepts only these environment names'
+        @($environments[0].attributes.options | Where-Object { $_.required }).Count |
+            Should -Be 0 -Because 'requesters choose a subset of environments rather than all of them'
+        $environments[0].validations |
+            Should -BeNullOrEmpty -Because 'GitHub issue forms do not support group-level validations on checkboxes; the bot enforces at least one selection'
+    }
+
+    It 'offers an optional GitOps sync root input defaulting to deploy' {
+        $syncRoot.Count | Should -Be 1
+        $syncRoot[0].type | Should -BeExactly 'input'
+        $syncRoot[0].attributes.label |
+            Should -BeExactly 'GitOps sync root' -Because 'the bot locates the sync root section by this exact heading'
+        $syncRoot[0].attributes.description |
+            Should -BeExactly 'Repository-relative directory that holds the per-environment overlays. Leave blank for `deploy`.'
+        $syncRoot[0].validations.required |
+            Should -BeFalse -Because 'a blank sync root falls back to deploy'
+    }
+
+    It 'explains what the bot does and warns against secrets' {
+        $markdown | Should -Match '(?i)platform\.kubernetes\.gitops'
+        $markdown | Should -Match '\.github/workflows/deployment-guide-trigger\.yaml'
+        $markdown | Should -Match '(?i)auto-?merge'
+        $markdown | Should -Match '(?i)already onboarded'
+        $markdown | Should -Match '(?i)at least one.*environment' -Because 'the form cannot enforce a selection, so requesters must be told the bot rejects an empty one'
+        $markdown | Should -Match '(?i)\bsecrets?\b'
+    }
+}

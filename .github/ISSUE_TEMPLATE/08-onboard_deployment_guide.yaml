@@ -1,0 +1,29 @@
+name: Onboard to the Deployment Guide
+description: Register an existing GitOps application with the Deployment Guide and install its trigger workflow
+title: "[Deployment Guide] "
+labels: ["deployment-guide-onboard"]
+body:
+- type: markdown
+  attributes:
+    value: |
+      The Platform Operator bot registers this repository with the Deployment Guide in `platform.kubernetes.gitops` and installs `.github/workflows/deployment-guide-trigger.yaml` in this repository.
+      The bot auto-merges both pull requests once its checks pass.
+      This works for repositories that are already GitOps-onboarded or dynamic-environment-onboarded.
+      It is safe to re-run: an already onboarded repository gets an "already onboarded" reply and no pull requests.
+      Tick at least one environment below; the bot rejects a request with no environment selected.
+      Do not include credentials, tenant IDs, subscriptions, client IDs, resource IDs, or secrets.
+- type: checkboxes
+  id: environments
+  attributes:
+    label: Deployment Guide environments
+    options:
+      - label: dev
+      - label: pre
+      - label: prd
+- type: input
+  id: gitops-sync-root
+  attributes:
+    label: GitOps sync root
+    description: Repository-relative directory that holds the per-environment overlays. Leave blank for `deploy`.
+  validations:
+    required: false
